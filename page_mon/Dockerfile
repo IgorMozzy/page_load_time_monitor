@@ -20,6 +20,6 @@ RUN chmod +x /app/chromedriver
 ENV DISPLAY=:99
 
 # way to get rid of zombie process of chromium
-ENTRYPOINT ["/usr/bin/dumb-init", " -- "]
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 CMD ["python", "mon_page_load.py"]

@@ -4,7 +4,7 @@ import logging
 import time
 
 from selenium import webdriver
-from selenium.common import TimeoutException
+from selenium.common import TimeoutException, WebDriverException
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from prometheus_client import start_http_server, Gauge
@@ -56,19 +56,31 @@ chrome_options.add_argument("--remote-debugging-pipe")
 
 service = Service('/app/chromedriver')
 
-# Метрика Prometheus
-PAGE_LOAD_TIME = Gauge('page_load_time_seconds', 'Page Load Time for monitored sites', ['url'])
+# Prometheus metric
+PAGE_LOAD_TIME = Gauge('page_load_time_seconds', 'Page Load Time for monitored urls', ['url'])
 
-def go(urls, timeout=30):
+def go(urls, timeout=30, frequency=60):
+
+    def pause_time_evaluator(freq_rate=1.0):
+        pause_time = round((frequency / len(urls) * freq_rate), 2)
+        logger.info(f"Pause between request was set to {pause_time} sec for {freq_rate} rate")
+        return pause_time
+
     while True:
         commence_time = time.time()
         driver = webdriver.Chrome(service=service, options=chrome_options)
         driver.set_page_load_timeout(timeout)
+
         # browser warm up
         try:
             driver.get('localhost')
         except:
             pass
+
+        # spare some time between requesting for the sake of cpu's hard life issues
+        #TODO: add autoadjustement
+        sleep_between = pause_time_evaluator()
+
         # real tasks
         for url in urls:
             start_time = time.time()
@@ -80,16 +92,27 @@ def go(urls, timeout=30):
                 PAGE_LOAD_TIME.labels(url=url).set(time.time() - start_time)
 
             except TimeoutException:
-                load_time = time.time() - start_time
                 logger.warning(f"Timed out! {url}: {load_time:.2f} sec")
 
-                PAGE_LOAD_TIME.labels(url=url).set(load_time)
-            stage_time = 10 - (time.time() - start_time)
+            except WebDriverException as err:
+                logger.warning(f"WebDriverException with {url}: {err.msg.splitlines()[0]}")
+
+            # pause before sending next request
+            stage_time = sleep_between - (time.time() - start_time)
             time.sleep(stage_time if stage_time > 0 else 0)
+
         driver.quit()
-        slp_time = 70 - (time.time() - commence_time)
-        logger.info(f"Pause:' {slp_time:.2f} sec")
+
+        # pause before next cycle
+        slp_time = frequency - (time.time() - commence_time)
+        if slp_time >= 0:
+            logger.info(f"Pause:' {slp_time:.2f} sec")
+        else:
+            logger.warning(f"Not enough time to perform {len(urls)} requests in {frequency} sec")
+
         time.sleep(slp_time if slp_time > 0 else 0)
+
+        logger.info(f"Free time at the end of the task: {slp_time}")
 
 if __name__ == "__main__":
     # Prometheus HTTP-server
