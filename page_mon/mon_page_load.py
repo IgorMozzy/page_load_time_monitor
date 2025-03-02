@@ -61,10 +61,14 @@ PAGE_LOAD_TIME = Gauge('page_load_time_seconds', 'Page Load Time for monitored u
 
 def go(urls, timeout=30, frequency=60):
 
-    def pause_time_evaluator(freq_rate=1.0):
+    freq_rate = 1.0
+
+    def pause_time_evaluator():
         pause_time = round((frequency / len(urls) * freq_rate), 2)
-        logger.info(f"Pause between request was set to {pause_time} sec for {freq_rate} rate")
+        logger.info(f"Pause between requests was set to {pause_time} sec for {freq_rate} rate")
         return pause_time
+
+    sleep_between = pause_time_evaluator()
 
     while True:
         commence_time = time.time()
@@ -76,10 +80,6 @@ def go(urls, timeout=30, frequency=60):
             driver.get('localhost')
         except:
             pass
-
-        # spare some time between requesting for the sake of cpu's hard life issues
-        #TODO: add autoadjustement
-        sleep_between = pause_time_evaluator()
 
         # real tasks
         for url in urls:
@@ -111,7 +111,6 @@ def go(urls, timeout=30, frequency=60):
             logger.warning(f"Not enough time to perform {len(urls)} requests in {frequency} sec")
 
         time.sleep(slp_time if slp_time > 0 else 0)
-
         logger.info(f"Free time at the end of the task: {slp_time}")
 
 if __name__ == "__main__":

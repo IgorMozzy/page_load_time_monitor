@@ -2,3 +2,4 @@
 .idea
 .env
 /grafana_backup.tar.gz
+temp.py
