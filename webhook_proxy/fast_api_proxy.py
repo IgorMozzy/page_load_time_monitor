@@ -22,4 +22,5 @@ async def handle_webhook(request: Request):
             response = await client.post(TARGET_URL, json=transformed_data)
         except:
             print('error: problem_with_sending to:', TARGET_URL)
-    return {"status": "ok", "target_response": response.status_code}
+        finally:
+            return {"status": "ok", "target_response": response.status_code}
