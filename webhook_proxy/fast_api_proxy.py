@@ -16,8 +16,7 @@ async def handle_webhook(request: Request):
     transformed_data = {
         "text": payload.get('message'),
     }
-
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(follow_redirects=True) as client:
         try:
             response = await client.post(TARGET_URL, json=transformed_data)
         except:
