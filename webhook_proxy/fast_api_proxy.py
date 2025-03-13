@@ -16,6 +16,7 @@ async def handle_webhook(request: Request):
 
     transformed_data = {
         "text": payload.get('message'),
+        "priority": {"priority": "important"}
     }
 
     async with httpx.AsyncClient() as client:
