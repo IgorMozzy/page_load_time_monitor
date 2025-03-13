@@ -1,7 +1,7 @@
 import os
-import requests
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
+import httpx
 
 app = FastAPI()
 
@@ -18,11 +18,10 @@ async def handle_webhook(request: Request):
         "text": payload.get('message'),
     }
 
-    try:
-        response = requests.post(TARGET_URL, json=transformed_data)
-        status_code = response.status_code
-    except requests.RequestException:
-        print('error: problem_with_sending to:', TARGET_URL)
-        status_code = None
-
-    return {"status": "ok", "target_response": status_code}
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(TARGET_URL, json=transformed_data)
+        except:
+            print('error: problem_with_sending to:', TARGET_URL)
+        finally:
+            return {"status": "ok", "target_response": response.status_code}
