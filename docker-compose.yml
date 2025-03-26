@@ -35,7 +35,7 @@ services:
       context: ./page_mon
       dockerfile: Dockerfile
     volumes:
-      - ./page_mon:/app
+      - app_data:/app
       - /tmp/selenium:/tmp
     #ports:
       #- "8015:8015"
@@ -60,6 +60,7 @@ services:
 
 volumes:
   grafana-data:
+  app_data:
 
 networks:
   default:

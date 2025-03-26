@@ -118,19 +118,3 @@ if __name__ == "__main__":
     start_http_server(8015)
 
     go(url_list)
-
-# TODO:Error after deployment
-# Traceback (most recent call last):
-#   File "/app/mon_page_load.py", line 120, in <module>
-#     go(url_list)
-#   File "/app/mon_page_load.py", line 75, in go
-#     driver = webdriver.Chrome(service=service, options=chrome_options)
-#   File "/usr/local/lib/python3.10/site-packages/selenium/webdriver/chrome/webdriver.py", line 45, in __init__
-#     super().__init__(
-#   File "/usr/local/lib/python3.10/site-packages/selenium/webdriver/chromium/webdriver.py", line 55, in __init__
-#     self.service.start()
-#   File "/usr/local/lib/python3.10/site-packages/selenium/webdriver/common/service.py", line 104, in start
-#     self._start_process(self._path)
-#   File "/usr/local/lib/python3.10/site-packages/selenium/webdriver/common/service.py", line 238, in _start_process
-#     raise WebDriverException(
-# selenium.common.exceptions.WebDriverException: Message: 'chromedriver' executable may have wrong permissions.
