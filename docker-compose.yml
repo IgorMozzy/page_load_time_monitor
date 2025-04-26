@@ -18,10 +18,17 @@ services:
       - GF_SECURITY_COOKIE_SAMESITE=${GF_SECURITY_COOKIE_SAMESITE}
       - GF_SECURITY_COOKIE_SECURE=${GF_SECURITY_COOKIE_SECURE}
 #      - GF_SERVER_ROOT_URL=http://localhost:3000/
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
     ports:
       - "${GF_PORT}:3000"
     volumes:
       - grafana-data:/var/lib/grafana
+      - ./grafana_setup/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana_setup/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana_setup/provisioning/alerting:/etc/grafana/provisioning/alerting
+      - ./grafana_setup/provisioning/notification-policies:/etc/grafana/provisioning/notification-policies
+      - ./grafana_setup/dashboards:/etc/grafana/dashboards
 
 #  blackbox-exporter:
 #    image: prom/blackbox-exporter:latest

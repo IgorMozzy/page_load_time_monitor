@@ -1,0 +1,64 @@
+apiVersion: 1
+groups:
+    - orgId: 1
+      name: default_eval_group
+      folder: alert_rules
+      interval: 1m
+      editable: true
+      rules:
+        - uid: f2ml6s
+          title: for_2min_load_6sec
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: prometheus-default
+              model:
+                disableTextWrap: false
+                editorMode: builder
+                expr: page_load_time_seconds
+                fullMetaSearch: false
+                includeNullMetadata: true
+                instant: true
+                intervalMs: 1000
+                legendFormat: '{{url}}'
+                maxDataPoints: 43200
+                range: false
+                refId: A
+                useBackend: false
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 1
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 2m
+          isPaused: false
+          notification_settings:
+            receiver: telegram-default
+          annotations:
+            summary: "Page load alert for {{ $labels.url }}"
+            description: "Load time is too high."
