@@ -1,8 +1,19 @@
+import logging
 import os
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 import httpx
 
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
 app = FastAPI()
 
 load_dotenv()
@@ -22,7 +33,8 @@ async def handle_webhook(request: Request):
     async with httpx.AsyncClient() as client:
         try:
             response = await client.post(TARGET_URL, json=transformed_data)
-        except:
-            print('error: problem_with_sending to:', TARGET_URL)
+        except Exception as e:
+            logger.error(f"Error sending to {TARGET_URL}: {str(e)}")
+            return {"status": "error", "error": str(e)}
         finally:
             return {"status": "ok", "target_response": response.status_code}
