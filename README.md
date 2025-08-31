@@ -23,13 +23,13 @@ Service that measures real page load times using Playwright (headless Chromium),
 
 ### 📂 Project Structure
 ```
-page_mon/             # Page load monitoring service
-webhook_proxy/        # FastAPI webhook proxy
-grafana_setup/        # Grafana dashboards, alerting, datasources
-docker-compose.yml    # Docker orchestration
-prometheus.yml        # Prometheus configuration
-.env                  # Environment variables
-README.md             # Project description
+page_mon/           # Page load monitoring service
+webhook_proxy/      # FastAPI webhook proxy
+grafana_setup/      # Grafana dashboards, alerting, datasources
+docker-compose.yml  # Docker orchestration
+prometheus.yml      # Prometheus configuration
+.env                # Environment variables
+README.md           # Project description
 ```
 
 ### ⚙️ Environment Variables
