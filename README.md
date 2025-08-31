@@ -1,6 +1,8 @@
 # Page load time monitor
 ### 📝 Overview
+
 Service that measures real page load times using Playwright (headless Chromium), exports metrics to Prometheus, and enables visualization and alerting through Grafana. Unlike simple ping or HTTP checks, this project uses a real browser engine (Playwright) to fully load pages, including JavaScript execution and resource fetching, providing a true measurement of page performance as experienced by real users.
+
 ![Dashboard](docs/dashboard_example.jpg)
 ---
 ### ✨ Features
