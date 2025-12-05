@@ -44,20 +44,33 @@ FREQUENCY = int(os.getenv("FREQUENCY", 60))  # enqueue frequency
 
 # TODO: consider implementation through semaphore
 async def monitor(urls, timeout=30, frequency=60):
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-
-        while True:
+    while True:
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=True,
+                                                  args=[
+                                                      "--no-sandbox",
+                                                      "--disable-dev-shm-usage",
+                                                      "--disable-gpu",
+                                                      "--disable-software-rasterizer",
+                                                      "--disable-features=VizDisplayCompositor",
+                                                      "--disable-ipc-flooding-protection",
+                                                      "--disable-background-timer-throttling",
+                                                      "--single-process",
+                                                      "--no-zygote",
+                                                  ]
+                                              )
             cycle_start_time = time.time()
             urls_queue = list(urls)
 
             while urls_queue:
                 url = urls_queue.pop(0)
 
-                context = await browser.new_context()
-                page = await context.new_page()
+                context = None
 
                 try:
+                    context = await browser.new_context()
+                    page = await context.new_page()
+
                     start_time = time.time()
                     await page.goto(url, timeout=timeout * 1000, wait_until="load")
                     load_time = time.time() - start_time
@@ -68,7 +81,12 @@ async def monitor(urls, timeout=30, frequency=60):
                 except Exception as e:
                     logger.warning(f"Error loading {url}: {str(e)}")
 
-                await context.close()
+                finally:
+                    try:
+                        await context.close()
+                        logger.debug(f"Context closed for {url}")
+                    except Exception as e:
+                        logger.error(f"Failed to close context for {url}: {e}")
 
                 # remaining time to complete cycle
                 elapsed_cycle = time.time() - cycle_start_time
@@ -82,6 +100,11 @@ async def monitor(urls, timeout=30, frequency=60):
                     await asyncio.sleep(next_pause)
                 else:
                     logger.debug(f"No pause, finishing cycle soon")
+
+            try:
+                await p.stop()
+            except Exception as e:
+                logger.warning(f"Playwright driver stop failed: {e}")
 
             # waiting for the next round
             total_elapsed = time.time() - cycle_start_time

@@ -3,6 +3,7 @@ services:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
+      - prometheus-data:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     #ports:
       #- "9090:9090"
@@ -38,6 +39,7 @@ services:
 #      #- "9115:9115"
 
   page_load_script:
+    init: true
     container_name: page_load_script
     build:
       context: ./page_mon
@@ -69,6 +71,7 @@ services:
 volumes:
   grafana-data:
   app_data:
+  prometheus-data:
 
 networks:
   default:
