@@ -59,6 +59,7 @@ groups:
           isPaused: false
           notification_settings:
             receiver: telegram-default
+          missing_series_evals_to_resolve: 8
           annotations:
             summary: "Page load alert for {{ $labels.url }}"
             description: "Load time is too high."
