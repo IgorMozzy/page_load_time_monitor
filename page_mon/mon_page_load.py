@@ -56,6 +56,7 @@ async def monitor(urls, timeout=30, frequency=60):
 
                 context = await browser.new_context()
                 page = await context.new_page()
+                load_time = 0
 
                 try:
                     start_time = time.time()
@@ -72,12 +73,12 @@ async def monitor(urls, timeout=30, frequency=60):
 
                 # remaining time to complete cycle
                 elapsed_cycle = time.time() - cycle_start_time
-                remaining_time = frequency - elapsed_cycle
+                remaining_time = frequency / 2 - elapsed_cycle
 
                 remaining_count = len(urls_queue)
 
                 if remaining_count > 0 and remaining_time > 0:
-                    next_pause = remaining_time / remaining_count
+                    next_pause = remaining_time / remaining_count - load_time
                     logger.debug(f"Next pause: {next_pause:.2f} sec")
                     await asyncio.sleep(next_pause)
                 else:

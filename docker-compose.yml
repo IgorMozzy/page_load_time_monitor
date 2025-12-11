@@ -2,6 +2,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
+    restart: unless-stopped
     volumes:
       - prometheus-data:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
@@ -11,6 +12,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
+    restart: unless-stopped
     environment:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
@@ -41,12 +43,12 @@ services:
   page_load_script:
     init: true
     container_name: page_load_script
+    restart: unless-stopped
     build:
       context: ./page_mon
       dockerfile: Dockerfile
     volumes:
       - app_data:/app
-      - /tmp/selenium:/tmp
     #ports:
       #- "8015:8015"
     environment:
@@ -55,10 +57,10 @@ services:
       - .env
     depends_on:
       - prometheus
-    restart: on-failure:1
 
   webhook_proxy:
     container_name: webhook_proxy
+    restart: unless-stopped
     build:
       context: ./webhook_proxy
       dockerfile: Dockerfile
@@ -66,7 +68,6 @@ services:
       #- "1234:1234"
     env_file:
       - .env
-    restart: on-failure:1
 
 volumes:
   grafana-data:

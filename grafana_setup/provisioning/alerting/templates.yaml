@@ -4,21 +4,23 @@ templates:
   - name: default.message.base
     template: |
       {{ define "default.message.base" }}
-      {{ if gt (len .Alerts.Firing) 0 }}
+      {{- if gt (len .Alerts.Firing) 0 -}}
       🔥Firing
-      {{ range .Alerts.Firing }}
+      {{ range .Alerts.Firing -}}
       - URL: {{ .Labels.url }}
       - Load time: {{ if .Values.A }}{{ printf "%.2f" .Values.A }}s{{ else }}n/a{{ end }}
-
       {{ end }}
+      {{- end }}
+      
+      {{- if gt (len .Alerts.Resolved) 0 -}}
+      {{- /* Добавляем отступ, если был блок Firing */ -}}
+      {{- if gt (len .Alerts.Firing) 0 }}
       {{ end }}
-
-      {{ if gt (len .Alerts.Resolved) 0 }}
       ✅Resolved
-      {{ range .Alerts.Resolved }}
+      {{ range .Alerts.Resolved -}}
       - URL: {{ .Labels.url }}
       - Load time: {{ if .Values.A }}{{ printf "%.2f" .Values.A }}s{{ else }}n/a{{ end }}
+      {{ end }}
+      {{- end }}
+      {{- end }}
 
-      {{ end }}
-      {{ end }}
-      {{ end }}
