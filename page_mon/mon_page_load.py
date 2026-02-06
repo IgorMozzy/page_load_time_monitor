@@ -60,8 +60,14 @@ async def monitor(urls, timeout=30, frequency=60):
 
                 try:
                     start_time = time.time()
-                    await page.goto(url, timeout=timeout * 1000, wait_until="load")
-                    load_time = time.time() - start_time
+                    response = await page.goto(url, timeout=timeout * 1000, wait_until="load")
+
+                    if response and 500 <= response.status < 600:
+                        logger.warning(
+                            f"Non-200 status code for {url}: {response.status if response else 'No Response'}")
+                        load_time = 30
+                    else:
+                        load_time = time.time() - start_time
 
                     logger.info(f"Load Time {url}: {load_time:.2f} sec")
                     PAGE_LOAD_TIME.labels(url=url).set(load_time)
