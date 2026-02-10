@@ -65,15 +65,16 @@ async def monitor(urls, timeout=30, frequency=60):
                     if response and 500 <= response.status < 600:
                         logger.warning(
                             f"Non-200 status code for {url}: {response.status if response else 'No Response'}")
-                        load_time = 30
+                        load_time = timeout
                     else:
                         load_time = time.time() - start_time
 
-                    logger.info(f"Load Time {url}: {load_time:.2f} sec")
-                    PAGE_LOAD_TIME.labels(url=url).set(load_time)
-
                 except Exception as e:
                     logger.warning(f"Error loading {url}: {str(e)}")
+                    load_time = timeout
+
+                logger.info(f"Load Time {url}: {load_time:.2f} sec")
+                PAGE_LOAD_TIME.labels(url=url).set(load_time)
 
                 await context.close()
 
