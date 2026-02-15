@@ -36,5 +36,3 @@ async def handle_webhook(request: Request):
         except Exception as e:
             logger.error(f"Error sending to {TARGET_URL}: {str(e)}")
             return {"status": "error", "error": str(e)}
-        finally:
-            return {"status": "ok", "target_response": response.status_code}
