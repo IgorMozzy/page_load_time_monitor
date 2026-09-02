@@ -54,7 +54,7 @@ async def monitor(urls, timeout=30, frequency=60):
             while urls_queue:
                 url = urls_queue.pop(0)
 
-                context = await browser.new_context()
+                context = await browser.new_context(java_script_enabled=False)
                 page = await context.new_page()
                 load_time = 0
 
